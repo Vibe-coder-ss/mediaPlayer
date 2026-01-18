@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoLab - Lightweight Video Player</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header with Tabs -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">▶</span>
+                <h1>VideoLab</h1>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="player">
+                    <span class="tab-icon">🎬</span>
+                    <span class="tab-text">Player</span>
+                </button>
+                <button class="tab-btn" data-tab="clip">
+                    <span class="tab-icon">✂️</span>
+                    <span class="tab-text">Clip</span>
+                </button>
+                <button class="tab-btn" data-tab="convert">
+                    <span class="tab-icon">🔄</span>
+                    <span class="tab-text">Convert</span>
+                </button>
+            </nav>
+            
+            <div class="header-spacer"></div>
+        </header>
+
+        <!-- Tab Content Container -->
+        <div class="tab-content-container">
+            
+            <!-- ==================== PLAYER TAB ==================== -->
+            <div class="tab-content active" id="playerTab">
+                <main class="main-content">
+                    <!-- Video Player Section -->
+                    <div class="player-section">
+                        <div class="video-container" id="videoContainer">
+                            <video id="videoPlayer" class="video-player">
+                                Your browser does not support the video tag.
+                            </video>
+                            
+                            <!-- Custom Controls -->
+                            <div class="video-controls" id="videoControls">
+                                <div class="progress-container">
+                                    <div class="progress-bar" id="progressBar">
+                                        <div class="progress-filled" id="progressFilled"></div>
+                                        <div class="progress-thumb" id="progressThumb"></div>
+                                    </div>
+                                    <span class="time-display">
+                                        <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                                    </span>
+                                </div>
+                                
+                                <div class="controls-row">
+                                    <div class="controls-left">
+                                        <button class="control-btn" id="playPauseBtn" title="Play/Pause (Space)">
+                                            <span class="icon-play">▶</span>
+                                            <span class="icon-pause" style="display:none;">⏸</span>
+                                        </button>
+                                        <button class="control-btn" id="stopBtn" title="Stop">⏹</button>
+                                        <button class="control-btn" id="rewindBtn" title="Rewind 10s (J)">⏪</button>
+                                        <button class="control-btn" id="forwardBtn" title="Forward 10s (L)">⏩</button>
+                                        
+                                        <div class="volume-control">
+                                            <button class="control-btn" id="muteBtn" title="Mute (M)">🔊</button>
+                                            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.1" value="1">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="controls-right">
+                                        <div class="speed-control">
+                                            <span class="speed-label">⚡</span>
+                                            <select id="playbackSpeed" class="speed-select" title="Preset Speeds">
+                                                <option value="0.25">0.25x</option>
+                                                <option value="0.5">0.5x</option>
+                                                <option value="0.75">0.75x</option>
+                                                <option value="1" selected>1x</option>
+                                                <option value="1.25">1.25x</option>
+                                                <option value="1.5">1.5x</option>
+                                                <option value="2">2x</option>
+                                                <option value="2.5">2.5x</option>
+                                                <option value="3">3x</option>
+                                                <option value="4">4x</option>
+                                            </select>
+                                            <input type="range" id="speedSlider" class="speed-slider" 
+                                                   min="0.1" max="4" step="0.05" value="1" 
+                                                   title="Fine-tune speed (0.1x - 4x)">
+                                            <span class="speed-value" id="speedValue">1.00x</span>
+                                        </div>
+                                        <div class="subtitle-control">
+                                            <input type="file" id="subtitleInput" accept=".srt,.vtt,.sub,.ass" hidden>
+                                            <button class="control-btn" id="subtitleBtn" title="Load Subtitles (C)">
+                                                <span class="subtitle-icon">CC</span>
+                                            </button>
+                                            <button class="control-btn subtitle-toggle" id="subtitleToggle" title="Toggle Subtitles" style="display:none;">
+                                                <span class="toggle-on">CC</span>
+                                            </button>
+                                        </div>
+                                        <button class="control-btn" id="fullscreenBtn" title="Fullscreen (F)">⛶</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- No Video Message / Drop Zone -->
+                            <div class="no-video-message" id="noVideoMessage">
+                                <span class="no-video-icon">🎬</span>
+                                <p>Drop a video file here or click to open</p>
+                                <button class="open-file-btn" id="openFileBtn">📂 Open Video File</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Now Playing Info -->
+                        <div class="now-playing" id="nowPlaying">
+                            <span class="now-playing-label">Now Playing:</span>
+                            <span class="now-playing-title" id="nowPlayingTitle">-</span>
+                            <span class="subtitle-indicator" id="subtitleIndicator" style="display:none;">📝 Subtitles</span>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <aside class="sidebar">
+                        <!-- Local File Picker -->
+                        <div class="file-picker-section">
+                            <div class="file-picker-header">
+                                <h2>📁 Local Videos</h2>
+                            </div>
+                            <div class="file-picker-content">
+                                <input type="file" id="fileInput" accept="video/*" multiple hidden>
+                                <button class="file-picker-btn" id="filePickerBtn">
+                                    <span class="file-picker-icon">➕</span>
+                                    <span>Add Videos</span>
+                                </button>
+                            </div>
+                            <div class="local-files-container" id="localFilesContainer">
+                                <div class="empty-state">
+                                    <span class="empty-state-icon">📂</span>
+                                    <p>No videos loaded</p>
+                                    <small>Click "Add Videos" or drag & drop</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Keyboard Shortcuts -->
+                        <div class="shortcuts-section">
+                            <div class="shortcuts-header">
+                                <h3>⌨️ Shortcuts</h3>
+                            </div>
+                            <div class="shortcuts-list">
+                                <div class="shortcut"><kbd>Space</kbd> Play/Pause</div>
+                                <div class="shortcut"><kbd>J</kbd>/<kbd>L</kbd> ±10s</div>
+                                <div class="shortcut"><kbd>,</kbd>/<kbd>.</kbd> Speed</div>
+                                <div class="shortcut"><kbd>M</kbd> Mute</div>
+                                <div class="shortcut"><kbd>F</kbd> Fullscreen</div>
+                                <div class="shortcut"><kbd>C</kbd> Subtitles</div>
+                            </div>
+                        </div>
+                    </aside>
+                </main>
+            </div>
+
+            <!-- ==================== CLIP TAB ==================== -->
+            <div class="tab-content" id="clipTab">
+                <div class="tool-container">
+                    <div class="tool-header">
+                        <h2>✂️ Video Clipper</h2>
+                        <p>Select a portion of a video to extract as a clip</p>
+                    </div>
+                    
+                    <div class="tool-content">
+                        <!-- Left: Video Preview -->
+                        <div class="tool-preview-section">
+                            <!-- File Selection -->
+                            <div class="file-drop-area" id="clipDropZone">
+                                <input type="file" id="clipFileInput" accept="video/*" hidden>
+                                <div class="drop-content" id="clipDropContent">
+                                    <span class="drop-icon">📁</span>
+                                    <p>Drop video here or click to select</p>
+                                    <small>Supports MP4, WebM, MKV, MOV, and more</small>
+                                </div>
+                                <div class="file-selected" id="clipFileSelected" style="display:none;">
+                                    <span class="file-icon">🎬</span>
+                                    <span class="file-name" id="clipFileName"></span>
+                                    <button class="change-file-btn" id="clipChangeFile">Change</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Video Preview -->
+                            <div class="preview-player" id="clipPreviewPlayer" style="display:none;">
+                                <video id="clipPreviewVideo" class="preview-video"></video>
+                                
+                                <!-- Clip Timeline -->
+                                <div class="clip-timeline" id="clipTimeline">
+                                    <div class="clip-track"></div>
+                                    <div class="clip-range" id="clipRange"></div>
+                                    <div class="clip-handle start" id="clipStartHandle">◀</div>
+                                    <div class="clip-handle end" id="clipEndHandle">▶</div>
+                                    <div class="clip-playhead" id="clipPlayhead"></div>
+                                </div>
+                                
+                                <!-- Preview Controls -->
+                                <div class="preview-controls">
+                                    <button class="control-btn" id="clipPlayBtn" title="Play/Pause">▶</button>
+                                    <button class="control-btn" id="clipPreviewSelection" title="Preview Selection">🔁 Preview Clip</button>
+                                    <span class="preview-time" id="clipPreviewTime">0:00 / 0:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right: Controls -->
+                        <div class="tool-controls-section" id="clipControlsSection" style="display:none;">
+                            <div class="control-group">
+                                <h3>⏱️ Time Selection</h3>
+                                
+                                <div class="time-row">
+                                    <div class="time-field">
+                                        <label>Start Time</label>
+                                        <div class="time-input-wrapper">
+                                            <input type="text" id="clipStartTime" class="time-input" value="0:00.0">
+                                            <button class="mark-btn" id="markStartBtn" title="Set to current time">📍</button>
+                                        </div>
+                                    </div>
+                                    <div class="time-field">
+                                        <label>End Time</label>
+                                        <div class="time-input-wrapper">
+                                            <input type="text" id="clipEndTime" class="time-input" value="0:00.0">
+                                            <button class="mark-btn" id="markEndBtn" title="Set to current time">📍</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="duration-box">
+                                    <span class="duration-label">Clip Duration</span>
+                                    <span class="duration-value" id="clipDurationDisplay">0:00.0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="control-group">
+                                <h3>📦 Output Format</h3>
+                                <div class="format-pills">
+                                    <label class="format-pill"><input type="radio" name="clipFormat" value="mp4" checked><span>MP4</span></label>
+                                    <label class="format-pill"><input type="radio" name="clipFormat" value="webm"><span>WebM</span></label>
+                                    <label class="format-pill"><input type="radio" name="clipFormat" value="mkv"><span>MKV</span></label>
+                                    <label class="format-pill"><input type="radio" name="clipFormat" value="mov"><span>MOV</span></label>
+                                </div>
+                            </div>
+                            
+                            <button class="action-btn primary" id="startClip">
+                                <span class="btn-icon">✂️</span>
+                                Create Clip
+                            </button>
+                            
+                            <!-- Progress -->
+                            <div class="progress-section" id="clipProgressSection" style="display:none;">
+                                <div class="progress-info">
+                                    <span id="clipProgressText">Creating clip...</span>
+                                    <span id="clipProgressPercent">0%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="clipProgressFill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== CONVERT TAB ==================== -->
+            <div class="tab-content" id="convertTab">
+                <div class="tool-container">
+                    <div class="tool-header">
+                        <h2>🔄 Video Converter</h2>
+                        <p>Convert videos between different formats</p>
+                    </div>
+                    
+                    <div class="ffmpeg-status" id="ffmpegStatus">
+                        <span class="status-icon">⏳</span>
+                        <span class="status-text">Checking FFmpeg availability...</span>
+                    </div>
+                    
+                    <div class="tool-content">
+                        <!-- Left: Video Selection -->
+                        <div class="tool-preview-section">
+                            <div class="file-drop-area" id="convertDropZone">
+                                <input type="file" id="convertFileInput" accept="video/*,audio/*" hidden>
+                                <div class="drop-content" id="convertDropContent">
+                                    <span class="drop-icon">📁</span>
+                                    <p>Drop video here or click to select</p>
+                                    <small>Supports most video and audio formats</small>
+                                </div>
+                                <div class="file-selected" id="convertFileSelected" style="display:none;">
+                                    <span class="file-icon">🎬</span>
+                                    <span class="file-name" id="convertFileName"></span>
+                                    <button class="change-file-btn" id="convertChangeFile">Change</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right: Format Selection -->
+                        <div class="tool-controls-section" id="convertControlsSection" style="display:none;">
+                            <div class="control-group">
+                                <h3>📦 Output Format</h3>
+                                
+                                <div class="format-grid">
+                                    <label class="format-option">
+                                        <input type="radio" name="convertFormat" value="mp4" checked>
+                                        <div class="format-card">
+                                            <span class="format-name">MP4</span>
+                                            <span class="format-desc">Universal, best compatibility</span>
+                                        </div>
+                                    </label>
+                                    <label class="format-option">
+                                        <input type="radio" name="convertFormat" value="webm">
+                                        <div class="format-card">
+                                            <span class="format-name">WebM</span>
+                                            <span class="format-desc">Web optimized, smaller size</span>
+                                        </div>
+                                    </label>
+                                    <label class="format-option">
+                                        <input type="radio" name="convertFormat" value="mkv">
+                                        <div class="format-card">
+                                            <span class="format-name">MKV</span>
+                                            <span class="format-desc">High quality container</span>
+                                        </div>
+                                    </label>
+                                    <label class="format-option">
+                                        <input type="radio" name="convertFormat" value="mov">
+                                        <div class="format-card">
+                                            <span class="format-name">MOV</span>
+                                            <span class="format-desc">Apple/QuickTime format</span>
+                                        </div>
+                                    </label>
+                                    <label class="format-option">
+                                        <input type="radio" name="convertFormat" value="mp3">
+                                        <div class="format-card audio">
+                                            <span class="format-name">MP3</span>
+                                            <span class="format-desc">Extract audio only</span>
+                                        </div>
+                                    </label>
+                                    <label class="format-option">
+                                        <input type="radio" name="convertFormat" value="wav">
+                                        <div class="format-card audio">
+                                            <span class="format-name">WAV</span>
+                                            <span class="format-desc">Lossless audio</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button class="action-btn primary" id="startConvert">
+                                <span class="btn-icon">⚡</span>
+                                Convert Video
+                            </button>
+                            
+                            <!-- Progress -->
+                            <div class="progress-section" id="convertProgressSection" style="display:none;">
+                                <div class="progress-info">
+                                    <span id="convertProgressText">Converting...</span>
+                                    <span id="convertProgressPercent">0%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill" id="convertProgressFill"></div>
+                                </div>
+                                <small class="progress-note">File will download automatically when complete</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/player.js"></script>
+    <script src="js/tabs.js"></script>
+    <script src="js/clipper.js"></script>
+    <script src="js/converter.js"></script>
+</body>
+</html>

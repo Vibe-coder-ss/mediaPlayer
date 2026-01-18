@@ -1,0 +1,26 @@
+{
+  "name": "videolab",
+  "version": "1.0.0",
+  "description": "Lightweight memory and CPU efficient video player",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "help": "node server.js --help"
+  },
+  "keywords": [
+    "video",
+    "player",
+    "streaming",
+    "lightweight",
+    "converter",
+    "clipper",
+    "subtitles"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^2.0.2"
+  }
+}
